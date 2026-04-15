@@ -1,298 +1,153 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>To-Do List | HTML e CSS</title>
+    <meta charset="UTF-8">
+    <title>Lista de Tarefas</title>
 
-  <style>
-    /* =========================================
-       RESET BÁSICO
-    ========================================== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
 
-    /* =========================================
-       VARIÁVEIS DE COR
-    ========================================== */
-    :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #dbe3ec;
-      --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+        }
 
-      --low-bg: #e8f7ea;
-      --low-text: #1f7a3a;
+        h1 {
+            text-align: center;
+            color: white;
+        }
 
-      --medium-bg: #fff4d6;
-      --medium-text: #8a5a00;
+        .form {
+            max-width: 400px;
+            margin: 20px auto;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
 
-      --high-bg: #ffe1e1;
-      --high-text: #b42318;
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
 
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-    }
+        button {
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-    /* =========================================
-       CORPO DA PÁGINA
-    ========================================== */
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 100%);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 24px;
-    }
+        .board {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-    }
+        .coluna {
+            flex: 1;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            min-height: 200px;
+        }
 
-    /* =========================================
-       CABEÇALHO
-    ========================================== */
-    .hero {
-      text-align: center;
-      margin-bottom: 24px;
-    }
+        .coluna h2 {
+            text-align: center;
+        }
 
-    .hero h1 {
-      font-size: 2rem;
-      margin-bottom: 8px;
-      color: #111827;
-    }
+        .tarefa {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            color: white;
+            animation: fadeIn 0.3s;
+        }
 
-    .hero p {
-      color: var(--muted);
-      font-size: 1rem;
-      max-width: 700px;
-      margin: 0 auto;
-      line-height: 1.5;
-    }
+        .baixa { background: #38a169; }
+        .media { background: #d69e2e; }
+        .alta { background: #e53e3e; }
 
-    /* =========================================
-       GRID PRINCIPAL
-    ========================================== */
-    .layout {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 24px;
-      align-items: start;
-    }
+        small {
+            display: block;
+            font-size: 12px;
+        }
 
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-    }
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(-5px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+    </style>
+</head>
+<body>
 
-    /* =========================================
-       CARTÕES
-    ========================================== */
-    .card {
-      background-color: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-    }
+    <h1>📋 Minhas Tarefas</h1>
 
-    .card-title {
-      font-size: 1.2rem;
-      margin-bottom: 14px;
-      color: #111827;
-    }
+    <div class="form">
+        <input type="text" id="tarefaInput" placeholder="Digite a tarefa">
+        <input type="date" id="dataTarefa">
 
-    .card-subtitle {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
+        <select id="prioridade">
+            <option value="baixa">🟢 Baixa</option>
+            <option value="media">🟡 Média</option>
+            <option value="alta">🔴 Alta</option>
+        </select>
 
-    /* =========================================
-       FORMULÁRIO (INTERFACE)
-       Observação: sem JS, a interface é visual
-    ========================================== */
-    .form-group {
-      margin-bottom: 16px;
-    }
+        <button onclick="adicionarTarefa()">Adicionar</button>
+    </div>
 
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
+    <div class="board">
+        <div class="coluna" id="baixaCol">
+            <h2>🟢 Baixa</h2>
+        </div>
 
-    input[type="text"],
-    select {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background-color: #fff;
-      font-size: 0.95rem;
-      color: var(--text);
-      outline: none;
-    }
+        <div class="coluna" id="mediaCol">
+            <h2>🟡 Média</h2>
+        </div>
 
-    input[type="text"]:focus,
-    select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-    }
+        <div class="coluna" id="altaCol">
+            <h2>🔴 Alta</h2>
+        </div>
+    </div>
 
-    .button-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
+    <script>
+        function adicionarTarefa() {
+            const texto = document.getElementById("tarefaInput").value;
+            const data = document.getElementById("dataTarefa").value;
+            const prioridade = document.getElementById("prioridade").value;
 
-    .btn {
-      display: inline-block;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: 0.2s ease;
-    }
+            if (texto.trim() === "" || data === "") {
+                alert("Preencha todos os campos!");
+                return;
+            }
 
-    .btn-primary {
-      background-color: var(--primary);
-      color: #fff;
-    }
+            const tarefa = document.createElement("div");
+            tarefa.classList.add("tarefa", prioridade);
 
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
+            tarefa.innerHTML = `
+                <strong>${texto}</strong>
+                <small>📅 ${data}</small>
+            `;
 
-    .btn-secondary {
-      background-color: #eef2ff;
-      color: #3730a3;
-    }
+            // Escolhe coluna correta
+            if (prioridade === "baixa") {
+                document.getElementById("baixaCol").appendChild(tarefa);
+            } else if (prioridade === "media") {
+                document.getElementById("mediaCol").appendChild(tarefa);
+            } else {
+                document.getElementById("altaCol").appendChild(tarefa);
+            }
 
-    .btn-secondary:hover {
-      background-color: #e0e7ff;
-    }
+            document.getElementById("tarefaInput").value = "";
+            document.getElementById("dataTarefa").value = "";
+        }
+    </script>
 
-    .note {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-left: 4px solid var(--primary);
-      background-color: #eff6ff;
-      color: #1e3a8a;
-      border-radius: 8px;
-      font-size: 0.93rem;
-      line-height: 1.5;
-    }
-
-    /* =========================================
-       RESUMO LATERAL
-    ========================================== */
-    .summary {
-      display: grid;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .summary-item {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      background-color: #fafcff;
-    }
-
-    .summary-item strong {
-      display: block;
-      font-size: 1.2rem;
-      margin-bottom: 4px;
-    }
-
-    .summary-item span {
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    /* =========================================
-       LEGENDA DE PRIORIDADE
-    ========================================== */
-    .legend {
-      display: grid;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.95rem;
-      color: var(--text);
-    }
-
-    .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .dot-low {
-      background-color: #22c55e;
-    }
-
-    .dot-medium {
-      background-color: #f59e0b;
-    }
-
-    .dot-high {
-      background-color: #ef4444;
-    }
-
-    /* =========================================
-       LISTA DE TAREFAS
-    ========================================== */
-    .tasks-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .tasks-header p {
-      color: var(--muted);
-      font-size: 0.94rem;
-    }
-
-    .task-list {
-      list-style: none;
-      display: grid;
-      gap: 14px;
-    }
-
-    .task-item {
-      position: relative;
-    }
-
-    .task-check {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .task-card {
-      display: grid;
+</body>
+</html>
